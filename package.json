@@ -1,0 +1,44 @@
+{
+  "name": "signdev-server",
+  "version": "1.0.0",
+  "description": "Backend server for SignDev - a digital document signing platform built with Node.js, Express, and MongoDB.",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "docusign-clone",
+    "pdf-signature",
+    "express",
+    "mongodb",
+    "nodejs",
+    "digital-signature",
+    "signdev"
+  ],
+  "author": "Dev Jasani",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.7.9",
+    "bcryptjs": "^2.4.3",
+    "cloudinary": "^2.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^5.0.0-beta.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^7.6.0",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.13",
+    "nodemon": "^3.1.9",
+    "pdf-lib": "^1.17.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/devjasani79/signdev-server"
+  },
+  "bugs": {
+    "url": "https://github.com/devjasani79/signdev-server/issues"
+  },
+  "homepage": "https://github.com/devjasani79/signdev-server#readme"
+}
