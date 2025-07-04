@@ -85,6 +85,19 @@ const updateDocument = async (req, res) => {
     res.status(500).json({ message: "Failed to update document" });
   }
 };
+const deleteDoc=async (req, res) => {
+  const { id } = req.params;
+  try {
+    const doc = await Document.findById(id);
+    if (!doc) return res.status(404).json({ msg: "Document not found" });
+
+    await Document.findByIdAndDelete(id);
+    res.status(200).json({ msg: "Deleted successfully" });
+  } catch (err) {
+    console.error("Delete error:", err);
+    res.status(500).json({ error: "Failed to delete document" });
+  }
+};
 
 
 module.exports = {
@@ -92,7 +105,8 @@ module.exports = {
   listUserDocuments,
   getDocumentById,
   streamPdf,
-  updateDocument
+  updateDocument,
+  deleteDoc
 };
 
 
