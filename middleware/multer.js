@@ -6,5 +6,3 @@ const upload = multer({ storage });
 
 module.exports = upload;
 
-// This file defines the multer middleware for handling file uploads.
-// It uses memory storage to store uploaded files in memory, which is suitable for processing PDF files

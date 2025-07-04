@@ -6,27 +6,23 @@ const auditSchema = new mongoose.Schema({
     ref: "Document",
     required: true,
   },
-
   signer: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User", // optional for public signers
+    ref: "User",
+    required: false, // for public view/sign
   },
-
   ipAddress: {
     type: String,
   },
-
   action: {
     type: String,
     enum: ["viewed", "signed", "rejected"],
     required: true,
   },
-
   reason: {
     type: String,
     default: "",
   },
-
   timestamp: {
     type: Date,
     default: Date.now,
@@ -34,6 +30,3 @@ const auditSchema = new mongoose.Schema({
 });
 
 module.exports = mongoose.model("Audit", auditSchema);
-
-// This file defines the audit schema for tracking actions related to document signing.
-// It uses Mongoose to create a schema that includes fields for the document ID, signer, IP address, action type, reason, and timestamp.
