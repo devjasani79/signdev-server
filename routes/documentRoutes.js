@@ -6,7 +6,6 @@ const {
   listUserDocuments,
   getDocumentById,
   streamPdf,
-  
 } = require("../controllers/documentController");
 
 const router = express.Router();
@@ -15,7 +14,6 @@ router.post("/upload", verifyToken, upload.single("file"), uploadDocument);
 router.get("/", verifyToken, listUserDocuments);
 router.get("/view/:id", streamPdf); 
 router.get("/:id", verifyToken, getDocumentById);
-router.delete("/:id", requireAuth, deleteDoc);
 
 module.exports = router;
 
