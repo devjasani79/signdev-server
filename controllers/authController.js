@@ -69,14 +69,23 @@ exports.requestReset = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) return res.status(404).json({ msg: "User not found" });
 
+    // Clear old OTPs
     await PasswordReset.deleteMany({ email });
+
+    // Save new OTP
     await PasswordReset.create({ email, otp, expiresAt });
 
-    await sendEmail(email, `Your OTP is: ${otp}`);
-    res.status(200).json({ msg: "OTP sent to email" });
+    // Send email (with try-catch inside for detailed error)
+    try {
+      await sendEmail(email, `Your OTP is: ${otp}`);
+      res.status(200).json({ msg: "OTP sent to email" });
+    } catch (emailErr) {
+      console.error("Email sending failed:", emailErr);
+      res.status(500).json({ error: "Failed to send OTP. Please try again." });
+    }
   } catch (err) {
     console.error("OTP request error:", err);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: "Server error. Please try again later." });
   }
 };
 
