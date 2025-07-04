@@ -1,7 +1,8 @@
-// controllers/documentController.js
 const Document = require("../models/Document");
+const jwt = require("jsonwebtoken");
+const sendEmail = require("../utils/sendEmail");
 
-// Upload new document
+// Upload new PDF
 const uploadDocument = async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ message: "No file uploaded" });
@@ -10,7 +11,6 @@ const uploadDocument = async (req, res) => {
       user: req.user._id,
       fileName: req.file.originalname,
       pdfBuffer: req.file.buffer,
-      status: "pending"
     });
 
     await doc.save();
@@ -23,6 +23,49 @@ const uploadDocument = async (req, res) => {
   } catch (error) {
     console.error("Upload error:", error);
     res.status(500).json({ message: "Failed to upload document" });
+  }
+};
+
+// List all documents of a user
+const listUserDocuments = async (req, res) => {
+  try {
+    const docs = await Document.find({ user: req.user._id })
+      .select("-pdfBuffer")
+      .sort({ uploadedAt: -1 });
+
+    res.json(docs);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch documents" });
+  }
+};
+
+// Get one document metadata
+const getDocumentById = async (req, res) => {
+  try {
+    const doc = await Document.findById(req.params.id).select("-pdfBuffer");
+    if (!doc || doc.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+    res.json(doc);
+  } catch (err) {
+    res.status(404).json({ message: "Document not found" });
+  }
+};
+
+// Stream full PDF
+const streamPdf = async (req, res) => {
+  try {
+    const doc = await Document.findById(req.params.id);
+    if (!doc || !doc.pdfBuffer) {
+      return res.status(404).json({ message: "PDF not found" });
+    }
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `inline; filename="${doc.fileName}"`);
+    res.send(doc.pdfBuffer);
+  } catch (err) {
+    console.error("Stream error:", err);
+    res.status(500).json({ message: "Failed to stream PDF" });
   }
 };
 
@@ -42,63 +85,29 @@ const updateDocument = async (req, res) => {
     res.status(500).json({ message: "Failed to update document" });
   }
 };
-
-const listUserDocuments = async (req, res) => {
-  try {
-    const docs = await Document.find({ user: req.user._id }).select("-pdfBuffer").sort({ createdAt: -1 });
-    res.json(docs);
-  } catch (err) {
-    res.status(500).json({ message: "Failed to fetch documents" });
-  }
-};
-
-const getDocumentById = async (req, res) => {
-  try {
-    const doc = await Document.findById(req.params.id).select("-pdfBuffer");
-    if (!doc || doc.user.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: "Access denied" });
-    }
-    res.json(doc);
-  } catch (err) {
-    res.status(404).json({ message: "Document not found" });
-  }
-};
-
-const streamPdf = async (req, res) => {
-  try {
-    const doc = await Document.findById(req.params.id);
-    if (!doc || !doc.pdfBuffer) {
-      return res.status(404).json({ message: "PDF not found" });
-    }
-
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", `inline; filename="${doc.fileName}"`);
-    res.send(doc.pdfBuffer);
-  } catch (err) {
-    console.error("Stream error:", err);
-    res.status(500).json({ message: "Failed to stream PDF" });
-  }
-};
-
-const deleteDoc = async (req, res) => {
+exports.deleteDoc = async (req, res) => {
   const { id } = req.params;
   try {
     const doc = await Document.findById(id);
-    if (!doc) return res.status(404).json({ message: "Document not found" });
+    if (!doc) return res.status(404).json({ msg: "Document not found" });
 
     await Document.findByIdAndDelete(id);
-    res.status(200).json({ message: "Deleted successfully" });
+    res.status(200).json({ msg: "Deleted successfully" });
   } catch (err) {
     console.error("Delete error:", err);
-    res.status(500).json({ message: "Failed to delete document" });
+    res.status(500).json({ error: "Failed to delete document" });
   }
 };
 
+
 module.exports = {
   uploadDocument,
-  updateDocument,
   listUserDocuments,
   getDocumentById,
   streamPdf,
-  deleteDoc,
+  updateDocument,
+  
 };
+
+
+
